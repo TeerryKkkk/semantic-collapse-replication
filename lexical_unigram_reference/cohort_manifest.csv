@@ -1,0 +1,16 @@
+model_family,run_id,filename
+DeepSeek-V3,3_deepseek_1000_v1,3_deepseek_1000_v1.txt
+DeepSeek-V3,3_deepseek_1000_v2,3_deepseek_1000_v2.txt
+DeepSeek-V3,3_deepseek_1000_v3,3_deepseek_1000_v3.txt
+GPT-4-mini,3_gpt_1000_v1,3_gpt_1000_v1.txt
+GPT-4-mini,3_gpt_1000_v2,3_gpt_1000_v2.txt
+GPT-4-mini,3_gpt_1000_v3,3_gpt_1000_v3.txt
+Phi-4,3_phi-4_1000_v1,3_phi-4_1000_v1.txt
+Phi-4,3_phi-4_1000_v2,3_phi-4_1000_v2.txt
+Phi-4,3_phi-4_1000_v3,3_phi-4_1000_v3.txt
+GPT-5.6 Terra,gpt5.6_1000_v1,gpt5.6_1000_v1.txt
+GPT-5.6 Terra,gpt5.6_1000_v2,gpt5.6_1000_v2.txt
+GPT-5.6 Terra,gpt5.6_1000_v3,gpt5.6_1000_v3.txt
+Claude Sonnet 5,sonnet_1000_v1,sonnet_1000_v1.txt
+Claude Sonnet 5,sonnet_1000_v2,sonnet_1000_v2.txt
+Claude Sonnet 5,sonnet_1000_v3,sonnet_1000_v3.txt
