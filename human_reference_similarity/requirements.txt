@@ -1,0 +1,4 @@
+matplotlib>=3.10,<4
+numpy>=2.2,<3
+openai>=1.98,<2
+tiktoken>=0.9,<1
