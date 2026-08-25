@@ -79,4 +79,4 @@ def _get_embedding(text: str, *,
         return resp.data[0].embedding
     except Exception as e:
         warnings.warn(f"[MemoryStore] Embedding failed: {e!r}")
-        return [0.0] * 1536
+        return [0.0] * 3072
