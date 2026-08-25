@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.py[cod]
+*.sqlite3
+.pytest_cache/
+outputs/
+data/*.jsonl.zst
+*.jsonl.zst
+rag_database/

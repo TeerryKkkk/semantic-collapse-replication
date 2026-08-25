@@ -1,0 +1,49 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Local tool state
+.codex_tmp/
+.cupy_cache/
+.mplconfig/
+*.log
+.DS_Store
+Thumbs.db
+
+# Local-only review material
+archive/
+docs/
+CODE_CLEANUP_REPORT.md
+GITHUB_READY_CHECKLIST.md
+PUBLIC_RELEASE_REVIEW.md
+
+# Binary and generated artifacts
+*.npy
+*.npz
+*.joblib
+*.sqlite
+*.sqlite3
+*.png
+*.pdf
+*.svg
+*.tiff
+
+# Retain only compact public result tables
+/results/*
+!/results/embedding_clustering/
+/results/embedding_clustering/*
+!/results/embedding_clustering/public/
+!/results/embedding_clustering/public/**
