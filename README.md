@@ -1,236 +1,63 @@
-# Semantic Collapse Replication Code
+# Multi-LLM Systems Exhibit Robust Semantic Collapse
 
-This repository contains custom simulation and analysis code associated with the manuscript:
+This repository contains simulation and analysis code accompanying the manuscript:
 
 **Multi-LLM Systems Exhibit Robust Semantic Collapse**
 
-The code is organized by pipeline stage: simulation, metric construction, and statistical analysis. Associated data artifacts, generated outputs, and review-access materials are handled through the manuscript’s Data Availability and Code Availability procedures.
+The repository is organized by computational component, including the closed-loop simulation scaffold, lexical and semantic metrics, statistical analyses, human-reference comparisons, representational analyses, and intervention-specific code.
+
+For the full experimental design, data construction, analysis definitions, and interpretation of the reported results, see the manuscript and Supplementary Information.
 
 ## Repository structure
 
-```text
-semantic-collapse-replication/
-  README.md
+| Path | Purpose |
+| --- | --- |
+| `simulation/` | Closed-loop multi-agent simulation scaffold |
+| `metrics/` | Core lexical and semantic metric implementations, including the time-resolved normalized Vendi analysis |
+| `statistics/` | Factorwise regression analysis for intervention comparisons |
+| `lexical_unigram_reference/` | Empirical unigram reference analysis for lexical accumulation |
+| `longitudinal_lda_compactness/` | Longitudinal LDA topic analysis and topic-conditioned semantic compactness analysis |
+| `embedding_clustering/` | Embedding clustering, cluster selection, and run/phase association analysis |
+| `model_attribution_classifier/` | Independent-reference model-attribution classifier |
+| `human_reference_similarity/` | Natural-message Human–LLM semantic comparison from analysis-ready message records |
+| `topic_matched_reddit_llm/` | Topic- and token-matched Human–LLM comparison |
+| `vendi_analysis/` | Exact-token baseline Vendi analysis across early, middle, and late phases |
+| `hc_ad_decoding/` | History-conditioned avoidance decoding intervention |
 
-  simulation/
-    standard_simulation_runner.py
+Each analysis directory contains its own entry points and, where needed, a module-specific `requirements.txt`.
 
-  metrics/
-    compute_lexical_diversity.py
-    compute_within_run_semantic_similarity.py
-    compute_cross_run_semantic_similarity.py
-    compute_embedding_diversity_vendi.py
-    compute_cross_run_semantic_support.py
+## Data and generated artifacts
 
-  statistics/
-    run_factorwise_window_regressions.py
-```
+Raw interaction transcripts, third-party source datasets, large embedding matrices, embedding caches, and other large generated artifacts are not stored in this repository unless explicitly included as lightweight public analysis files.
 
-## Simulation code
+The corresponding data sources, cohort definitions, and availability information are described in the manuscript.
 
-### `simulation/standard_simulation_runner.py`
+Analysis scripts generally accept local input paths or expect data in the module-specific locations documented in their README files.
 
-This script implements the standard closed-loop multi-agent simulation environment used for the baseline multi-LLM interaction setting.
+## API credentials
 
-It includes:
+No API credentials are stored in this repository.
 
-- agent initialization;
-- round-based interaction;
-- randomized agent action order;
-- referee-mediated utterance classification;
-- message routing between agents;
-- short-term context construction;
-- RAG-backed memory retrieval and packing;
-- transcript logging.
+Scripts that require external model or embedding services read credentials from environment variables. The required variables depend on the module and backend being used.
 
-The script uses in-file configuration constants for model names, decoding settings, round count, memory settings, and output paths. Conditions that modify model identity, decoding parameters, prompt variants, output budget, or run length are represented through configuration changes rather than separate simulation logic.
+## Running the analyses
 
-Required credentials, depending on the model backends used, are supplied through environment variables:
+The analysis modules are designed to be run independently. See the README inside each top-level directory for the relevant entry point, expected inputs, and example invocation.
 
-```text
-OPENAI_API_KEY
-DEEPSEEK_API_KEY
-AZURE_ENDPOINT
-AZURE_KEY
-```
+Where a module contains a `requirements.txt`, install those dependencies in the environment used for that analysis.
 
-## Metric construction code
+## Vendi analyses
 
-### `metrics/compute_lexical_diversity.py`
+Two distinct Vendi analyses are included in the repository.
 
-This script computes lexical-diversity measures from simulation transcripts.
+`metrics/compute_embedding_diversity_vendi.py` implements the time-resolved utterance-level analysis. Within each 10-round interval, utterances are rarefied without replacement to a fixed sample of 30, normalized Vendi is calculated for each of 200 draws, and the draw-level values are averaged.
 
-It parses transcript files and computes vocabulary-growth measures, including cumulative unique-token counts and new-token increments over fixed windows or rounds. It is used to construct lexical-diversity source tables for comparing surface-level vocabulary growth across model and prompt conditions.
+`vendi_analysis/` implements the separate exact-token baseline analysis used for the early-to-late comparison.
 
-### `metrics/compute_within_run_semantic_similarity.py`
+These analyses address different measurement questions and should be treated separately.
 
-This script computes within-run semantic similarity over time.
+## Citation
 
-It parses a single simulation transcript, constructs fixed-size non-overlapping windows, embeds each window, and computes within-run semantic similarity measures, including:
+If you use this code, please cite the accompanying manuscript:
 
-- similarity of each window to the previous window;
-- similarity of each window to the first window;
-- first-window to last-window similarity;
-- window-level semantic-similarity outputs for downstream analysis.
-
-The default semantic representation uses:
-
-```text
-text-embedding-3-large
-```
-
-API credentials are supplied through:
-
-```text
-OPENAI_API_KEY
-```
-
-The script also contains local or TF-IDF fallback branches for alternative representations and validation checks.
-
-### `metrics/compute_cross_run_semantic_similarity.py`
-
-This script computes cross-run semantic similarity across independent simulation runs.
-
-It parses multiple transcript files, constructs aligned windows, embeds window text, and computes pairwise semantic similarity between time-aligned windows from independent runs.
-
-It produces outputs including:
-
-- pairwise cross-run cosine similarity curves;
-- weighted mean cross-run similarity by window;
-- lexical-overlap diagnostics;
-- per-file vocabulary-growth diagnostics.
-
-This script is used to construct cross-run semantic-similarity source tables for downstream statistical analysis.
-
-API credentials are supplied through:
-
-```text
-OPENAI_API_KEY
-```
-
-### `metrics/compute_embedding_diversity_vendi.py`
-
-This script computes message-level embedding-diversity measures and Vendi-style semantic-support metrics.
-
-It parses simulation transcripts at the message level, embeds individual utterances, caches message-level embeddings, and computes within-window embedding-diversity measures, including:
-
-- Vendi Score;
-- normalized Vendi Score;
-- mean pairwise cosine similarity;
-- mean pairwise cosine distance;
-- centroid-based distance;
-- covariance effective rank.
-
-The script can process selected 1000-round extended-baseline runs and selected 200-round standard runs, depending on filename selection patterns. Analyses requiring a fixed 100-window horizon should filter to the 1000-round baseline files.
-
-The generated `run_summary.csv` uses the script’s existing half-split summary as a diagnostic. Paper-level first-window or terminal-window contrasts should be computed from the window-level output table when required.
-
-API credentials are supplied through:
-
-```text
-OPENAI_API_KEY
-```
-
-### `metrics/compute_cross_run_semantic_support.py`
-
-This script computes cache-based cross-run semantic-support measures.
-
-It uses metadata and embedding-cache files generated by `compute_embedding_diversity_vendi.py`. It is cache-only: it does not call OpenAI and does not read any API credential.
-
-It performs cache validation and computes:
-
-- 10-round window centroids;
-- same-family cross-run cosine similarity;
-- same-family cross-run cosine distance;
-- cross-run Vendi Score;
-- normalized cross-run Vendi Score;
-- early/late cross-run semantic-support summaries;
-- same-family versus different-family reference comparisons.
-
-The script expects cached embeddings generated with:
-
-```text
-text-embedding-3-large
-```
-
-and embedding dimension:
-
-```text
-3072
-```
-
-## Statistical analysis code
-
-### `statistics/run_factorwise_window_regressions.py`
-
-This script performs factorwise window-level intervention regression analyses using prepared within-run and cross-run metric tables.
-
-It implements:
-
-- within-run and cross-run regression-table preparation;
-- conversion from similarity to diversity direction by using negative similarity values;
-- factor-specific baseline rules;
-- model-group-specific analyses where applicable;
-- time-window fixed effects;
-- cluster-robust standard errors;
-- Holm-Bonferroni correction for multiple comparisons;
-- coefficient-level regression output tables;
-- summary tables of raw and corrected significance.
-
-The main factorwise regression script covers the standard 200-round intervention analyses. Horizon-specific intervention analyses with different run structures may be handled separately using the same metric and regression conventions.
-
-## Credentials
-
-No API credentials should be stored in this repository.
-
-Scripts that call external APIs read credentials from environment variables, including:
-
-```text
-OPENAI_API_KEY
-DEEPSEEK_API_KEY
-AZURE_ENDPOINT
-AZURE_KEY
-```
-
-The cache-based cross-run semantic-support script does not call OpenAI and does not require an API key.
-
-## Dependencies
-
-The scripts use standard scientific Python packages and model/API clients, including:
-
-```text
-numpy
-pandas
-matplotlib
-scikit-learn
-statsmodels
-openai
-chromadb
-tiktoken
-azure-ai-inference
-azure-core
-```
-
-Some optional local-embedding branches may require:
-
-```text
-sentence-transformers
-```
-
-Dependencies are not vendored in this repository.
-
-## Notes on reproducibility scope
-
-The repository is organized around the following computational stages:
-
-```text
-simulation  -> closed-loop multi-agent transcript generation
-metrics     -> lexical, semantic, Vendi, and semantic-support metric construction
-statistics  -> factorwise regression analysis and multiple-comparison correction
-```
-
-Generated data artifacts, embedding caches, figures, and source tables should be managed through the project’s data-release and review-access workflow rather than embedded directly into the code tree unless explicitly prepared for archival release.
-
-## Repository hygiene
-
-Recommended ignored files include local credentials, caches, generated outputs, and Python build artifacts. The repository should not track API-key files, local environment files, embedding caches, generated figures, or temporary analysis outputs.
+**Multi-LLM Systems Exhibit Robust Semantic Collapse**
