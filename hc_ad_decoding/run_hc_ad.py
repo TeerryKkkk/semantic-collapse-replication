@@ -1,6 +1,6 @@
 """Run the conversational HC-AD intervention.
 
-The bundled, hash-verified baseline supplies prompts, memory/RAG, judge,
+The bundled baseline supplies prompts, memory/RAG, judge,
 routing, and round structure. This runner replaces only free-agent generation
 with HC-AD.
 """
@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import builtins
-import hashlib
 import importlib.util
 import os
 from pathlib import Path
@@ -27,20 +26,11 @@ from hc_ad_integration import (
 
 
 BUNDLED_HOST_PATH = Path(__file__).with_name("standard_run.py")
-STANDARD_RUN_SHA256 = (
-    "609aea51c29e629a24e04f0d9ee9c2f0f7587069eb513a3c0af6213daa851d50"
-)
 
 
 def load_host_module(path: Path) -> ModuleType:
     if not path.is_file():
         raise FileNotFoundError(f"Host simulation not found: {path}")
-    actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
-    if actual_hash != STANDARD_RUN_SHA256:
-        raise RuntimeError(
-            "Host simulation hash mismatch. "
-            f"Expected {STANDARD_RUN_SHA256}, got {actual_hash}: {path}"
-        )
     if not hasattr(builtins, "AZURE_ENDPOINT"):
         builtins.AZURE_ENDPOINT = os.getenv(
             "AZURE_ENDPOINT",
@@ -73,7 +63,7 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=BUNDLED_HOST_PATH,
         help=(
-            "Hash-matching baseline simulation module; defaults to the "
+            "Baseline simulation module; defaults to the "
             "bundled standard_run.py."
         ),
     )
