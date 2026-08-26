@@ -20,7 +20,7 @@ def _close(actual: float, expected: float, tolerance: float) -> bool:
     return bool(np.isclose(actual, expected, rtol=0.0, atol=tolerance))
 
 
-def verify_release(
+def verify_results(
     embeddings_path: Path,
     manifest_path: Path,
     results_dir: Path,
@@ -199,7 +199,7 @@ def verify_and_write(
     refit_selected: bool = False,
     tolerance: float = 1e-12,
 ) -> dict[str, Any]:
-    report = verify_release(
+    report = verify_results(
         embeddings_path,
         manifest_path,
         results_dir,
@@ -209,5 +209,5 @@ def verify_and_write(
     write_json(report_path.resolve(), report)
     if not report["passed"]:
         failed = [name for name, passed in report["checks"].items() if not passed]
-        raise RuntimeError(f"Release verification failed: {failed}")
+        raise RuntimeError(f"Verification failed: {failed}")
     return report
