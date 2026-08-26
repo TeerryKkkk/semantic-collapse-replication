@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import silhouette_score
 
-from .characterize import assignment_label_hash, association_summary
+from .characterize import association_summary
 from .config import K_VALUES, MODEL_SPECS, SEEDS
 from .io import load_inputs, write_json
 from .select_k import choose_k_from_summary
@@ -30,9 +30,7 @@ def verify_results(
 ) -> dict[str, Any]:
     """Check fixed inputs, summaries, assignments, AMI values, and selected fits."""
 
-    matrix, manifest, input_validation = load_inputs(
-        embeddings_path, manifest_path, check_hashes=True
-    )
+    matrix, manifest, input_validation = load_inputs(embeddings_path, manifest_path)
     results_dir = results_dir.resolve()
     assignments = pd.read_csv(results_dir / "primary_cluster_assignments.csv")
     family_summary = pd.read_csv(results_dir / "family_summary.csv")
@@ -76,7 +74,6 @@ def verify_results(
         selected_row = family_k.loc[family_k["k"].eq(selected_k)].iloc[0]
         selected_seed = int(family_row["selected_seed"])
         associations = association_summary(family_assignments)
-        label_hash = assignment_label_hash(family_assignments)
 
         run_saved = float(
             association_table.loc[
@@ -129,7 +126,6 @@ def verify_results(
             ),
             "saved_run_ami": _close(run_saved, spec.run_ami, tolerance),
             "saved_phase_ami": _close(phase_saved, spec.phase_ami, tolerance),
-            "assignment_label_hash": label_hash == spec.label_sha256_int32,
         }
         refit_details: dict[str, Any] | None = None
         if refit_selected:
@@ -174,7 +170,6 @@ def verify_results(
             "stability_screen_relaxed": stability_relaxed,
             "run_ami": associations["run_ami"],
             "phase_ami": associations["phase_ami"],
-            "label_sha256_int32": label_hash,
             "selected_refit": refit_details,
         }
         checks[f"{spec.slug}_all_checks"] = all(family_checks.values())

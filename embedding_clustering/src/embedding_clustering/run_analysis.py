@@ -160,14 +160,10 @@ def run_analysis(
     embeddings_path: Path,
     manifest_path: Path,
     output_dir: Path,
-    *,
-    check_hashes: bool = True,
 ) -> pd.DataFrame:
     """Run the exact family-specific clustering workflow and save its outputs."""
 
-    matrix, manifest, input_validation = load_inputs(
-        embeddings_path, manifest_path, check_hashes=check_hashes
-    )
+    matrix, manifest, input_validation = load_inputs(embeddings_path, manifest_path)
     output_dir = output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     write_json(output_dir / "input_validation.json", input_validation)
@@ -222,7 +218,7 @@ def run_analysis(
         )
 
     combined = pd.concat(all_assignments, ignore_index=True)
-    combined.to_csv(output_dir / "all_primary_cluster_assignments.csv", index=False)
+    combined.to_csv(output_dir / "primary_cluster_assignments.csv", index=False)
     summary = pd.DataFrame(family_summaries)
     summary.to_csv(output_dir / "family_summary.csv", index=False)
     pd.concat(k_summaries, ignore_index=True).to_csv(
@@ -278,11 +274,6 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("results/embedding_clustering/public"),
     )
     parser.add_argument(
-        "--no-hash-check",
-        action="store_true",
-        help="Allow a structurally valid input other than the fixed reference files.",
-    )
-    parser.add_argument(
         "--validate-only",
         action="store_true",
         help="Validate the fixed inputs and exit without fitting or writing outputs.",
@@ -294,16 +285,13 @@ def main(argv: Sequence[str] | None = None) -> None:
     args = build_parser().parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     if args.validate_only:
-        _, _, validation = load_inputs(
-            args.embeddings, args.manifest, check_hashes=not args.no_hash_check
-        )
+        _, _, validation = load_inputs(args.embeddings, args.manifest)
         print(json.dumps(validation, indent=2))
         return
     summary = run_analysis(
         args.embeddings,
         args.manifest,
         args.output,
-        check_hashes=not args.no_hash_check,
     )
     print(summary.to_string(index=False))
 

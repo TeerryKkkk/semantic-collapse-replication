@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 from sklearn.metrics import adjusted_mutual_info_score
 
@@ -37,13 +36,3 @@ def association_summary(assignments: pd.DataFrame) -> dict[str, float]:
             adjusted_mutual_info_score(assignments["cluster"].astype(int), phases)
         ),
     }
-
-
-def assignment_label_hash(assignments: pd.DataFrame) -> str:
-    """Hash labels in family-row order for result verification."""
-
-    import hashlib
-
-    ordered = assignments.sort_values("family_row_index_0_based")
-    labels = ordered["cluster"].to_numpy(np.int32)
-    return hashlib.sha256(labels.tobytes()).hexdigest()

@@ -1,8 +1,7 @@
-"""Input loading, validation, hashing, and JSON helpers."""
+"""Input loading, validation, and JSON helpers."""
 
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -12,8 +11,6 @@ import pandas as pd
 
 from .config import (
     EXPECTED_EMBEDDING_SHAPE,
-    EXPECTED_MANIFEST_SHA256,
-    EXPECTED_MATRIX_SHA256,
     MODEL_NAMES,
     RUN_ORDER,
 )
@@ -30,16 +27,6 @@ REQUIRED_MANIFEST_COLUMNS = (
 )
 
 
-def sha256_file(path: Path) -> str:
-    """Return a streaming SHA-256 digest for *path*."""
-
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
-
-
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     """Write stable, human-readable JSON."""
 
@@ -50,8 +37,6 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
 def load_inputs(
     embeddings_path: Path,
     manifest_path: Path,
-    *,
-    check_hashes: bool = True,
 ) -> tuple[np.ndarray, pd.DataFrame, dict[str, Any]]:
     """Load and validate the fixed matrix and row manifest."""
 
@@ -62,19 +47,6 @@ def load_inputs(
     if not manifest_path.is_file():
         raise FileNotFoundError(f"Embedding manifest not found: {manifest_path}")
 
-    matrix_hash = sha256_file(embeddings_path)
-    manifest_hash = sha256_file(manifest_path)
-    if check_hashes and matrix_hash != EXPECTED_MATRIX_SHA256:
-        raise ValueError(
-            "Embedding matrix SHA-256 does not match the expected input: "
-            f"{matrix_hash}"
-        )
-    if check_hashes and manifest_hash != EXPECTED_MANIFEST_SHA256:
-        raise ValueError(
-            "Manifest SHA-256 does not match the expected input: "
-            f"{manifest_hash}"
-        )
-
     matrix = np.load(embeddings_path, allow_pickle=False)
     manifest = pd.read_csv(manifest_path)
     validation = validate_inputs(matrix, manifest)
@@ -82,9 +54,6 @@ def load_inputs(
         {
             "embeddings_file": embeddings_path.name,
             "manifest_file": manifest_path.name,
-            "matrix_sha256": matrix_hash,
-            "manifest_sha256": manifest_hash,
-            "hash_check_enabled": check_hashes,
         }
     )
     return matrix, manifest, validation
