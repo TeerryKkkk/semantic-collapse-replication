@@ -23,13 +23,6 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Local-only review material
-archive/
-docs/
-CODE_CLEANUP_REPORT.md
-GITHUB_READY_CHECKLIST.md
-PUBLIC_RELEASE_REVIEW.md
-
 # Binary and generated artifacts
 *.npy
 *.npz
