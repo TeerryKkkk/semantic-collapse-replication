@@ -18,10 +18,6 @@ Computes longitudinal within-run semantic similarity measures from fixed interac
 
 Computes semantic similarity across independent trajectories using aligned interaction intervals.
 
-### `compute_cross_run_semantic_support.py`
-
-Computes cross-run semantic-support quantities from prepared message-level embedding caches.
-
 ### `compute_embedding_diversity_vendi.py`
 
 Computes the time-resolved utterance-level normalized Vendi analysis.
