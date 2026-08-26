@@ -1,4 +1,4 @@
-"""Authoritative parser and baseline-run selection for simulation logs."""
+"""Parser and baseline-run selection for simulation logs."""
 
 from __future__ import annotations
 
@@ -325,7 +325,7 @@ def load_baseline_corpus(
     manifest = pd.DataFrame(manifest_rows).sort_values(
         ["model_family", "version_number"], na_position="last"
     )
-    # Preserve the finalized manifest traversal order used by the compactness
+    # Preserve the manifest traversal order used by the compactness
     # analysis so fixed-seed sampling maps to the same utterance pairs.
     utterances = (
         pd.DataFrame(utterance_rows)

@@ -35,7 +35,7 @@ MODEL_C = "gpt-4o-mini"
 REFEREE_MODEL = "gpt-4o-mini"  
 
 # ===== Output files =====
-OUTPUT_LOG  = "gptrenew_V3.txt"        
+OUTPUT_LOG  = "transcript.txt"
 MAPPING_LOG = "3agents_models.txt"  # Text recodings
 
 TEMPERATURE = 0.9

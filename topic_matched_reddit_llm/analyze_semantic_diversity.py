@@ -415,7 +415,7 @@ def main() -> None:
     (output_dir / "analysis_metadata.json").write_text(json.dumps({
         "embedding_model": EMBEDDING_MODEL,
         "tokenizer": TOKENIZER_NAME,
-        "embedding_input": "authoritative fixed-length token-ID arrays",
+        "embedding_input": "fixed-length token-ID arrays",
         "vendi_definition": "cosine Gram kernel -> trace normalization -> exp(entropy) / m",
         "m": CHUNKS_PER_WINDOW,
         "bootstrap_draws": args.bootstrap_draws,

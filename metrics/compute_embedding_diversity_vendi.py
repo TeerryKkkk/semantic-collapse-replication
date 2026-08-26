@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """Compute ED Fig. 5e time-resolved normalized Vendi trajectories.
 
-The analysis uses individual agent-utterance embeddings from the
-``text-embedding-3-large`` lineage. Each 1,000-round transcript is divided into
+The analysis uses individual agent-utterance embeddings using
+``text-embedding-3-large``. Each 1,000-round transcript is divided into
 100 non-overlapping 10-round intervals. Within every run-interval, 30
 utterances are sampled without replacement 200 times. For each draw, the
 cosine Gram matrix is converted to an eigenspectrum, Vendi effective support is
@@ -133,7 +133,7 @@ def is_non_agent_record(tag: str, speaker: str) -> bool:
 
 
 def parse_agent_messages(text: str) -> Tuple[List[ParsedMessage], List[int]]:
-    """Follow the original message parser and retain agent ``said:`` records."""
+    """Parse and retain agent ``said:`` records."""
 
     messages: List[Dict[str, object]] = []
     rounds_seen: set[int] = set()
@@ -301,7 +301,7 @@ def embed_unique_texts(
     texts: Sequence[str],
     api_key_environment_variable: str,
 ) -> np.ndarray:
-    """Embed utterances using the original model and batching/chunking lineage."""
+    """Embed utterances using the configured model and batching/chunking procedure."""
 
     api_key = os.environ.get(api_key_environment_variable, "").strip()
     if not api_key:
@@ -484,7 +484,7 @@ def compute_rarefied_metrics(
     n_repeats: int,
     rng: np.random.Generator,
 ) -> Tuple[Dict[str, float], Dict[str, object]]:
-    """Preserve the confirmed m=30 rarefaction and Vendi calculation."""
+    """Compute fixed-m rarefied Vendi metrics."""
 
     n_messages = int(x_raw.shape[0])
     if n_messages < m:
@@ -519,8 +519,8 @@ def compute_rarefied_metrics(
         for start in range(0, n_repeats, DRAW_CHUNK_SIZE):
             chunk = min(DRAW_CHUNK_SIZE, n_repeats - start)
             random_keys = rng.random((chunk, n_messages), dtype=np.float32)
-            # The m smallest independent random keys select m distinct rows,
-            # exactly preserving the original without-replacement behavior.
+            # The m smallest independent random keys select m distinct rows
+            # without replacement.
             draw_indices = np.argpartition(random_keys, kth=m - 1, axis=1)[:, :m]
             samples = x[draw_indices]
             grams = np.einsum(
