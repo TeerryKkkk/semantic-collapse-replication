@@ -1,4 +1,4 @@
-"""Scientific constants for the reviewer-response clustering analysis."""
+"""Scientific constants for the embedding-clustering analysis."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ PHASE_LABELS = ("Early (1-33)", "Middle (34-66)", "Late (67-100)")
 
 @dataclass(frozen=True)
 class ModelSpec:
-    """Stable model metadata plus expected final results used for QA."""
+    """Stable model metadata plus reference values used for verification."""
 
     name: str
     slug: str

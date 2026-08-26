@@ -45,7 +45,7 @@ Input and result verification utilities are available through:
 scripts/verify_embedding_clustering.py
 ```
 
-When the corresponding embedding matrix is available, the released summaries can be checked with the verification script.
+When the corresponding embedding matrix is available, the included summaries can be checked with the verification script.
 
 ## Public outputs
 

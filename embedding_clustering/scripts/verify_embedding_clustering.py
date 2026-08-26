@@ -1,4 +1,4 @@
-"""Verify final analysis summaries and optionally refit selected solutions."""
+"""Verify embedding-clustering summaries and optionally refit selected solutions."""
 
 from __future__ import annotations
 

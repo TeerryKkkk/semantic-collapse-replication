@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-"""Run the primary frozen five-class independent-reference classifier."""
+"""Run the five-class independent-reference classifier."""
 
 import argparse
 import csv

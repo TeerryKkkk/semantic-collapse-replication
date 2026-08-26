@@ -1,4 +1,4 @@
-"""Lightweight verification of the released analysis results."""
+"""Lightweight verification of the embedding-clustering results."""
 
 from __future__ import annotations
 

@@ -295,7 +295,7 @@ def build_embeddings(corpus: List[str]):
             v = _embed_with_openai(txt)
             all_vecs.append(v)
         E = np.vstack(all_vecs).astype("float32")
-        # L2 normalization, matching the original code.
+        # L2-normalize embedding rows.
         E = E / (np.linalg.norm(E, axis=1, keepdims=True) + 1e-12)
         print(f"[OPENAI] using model: {OPENAI_EMBED_MODEL}, got shape={E.shape}")
         return E

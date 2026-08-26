@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Complete-message Reddit-versus-LLM semantic-similarity analysis.
 
-The public pipeline has two commands.
+The analysis has two commands.
 
 ``compute`` expects a UTF-8 CSV with these columns:
 
@@ -732,7 +732,7 @@ def parser() -> argparse.ArgumentParser:
     compute_parser.add_argument("--output", type=Path, required=True)
     compute_parser.add_argument("--api-key-env", default="OPENAI_API_KEY")
     compute_parser.set_defaults(func=compute)
-    summary_parser = subparsers.add_parser("summarize", help="Aggregate unit similarities and create the final figure")
+    summary_parser = subparsers.add_parser("summarize", help="Aggregate unit similarities and create the summary figure")
     summary_parser.add_argument("--units", type=Path, required=True)
     summary_parser.add_argument("--output-dir", type=Path, required=True)
     summary_parser.add_argument("--bootstrap-resamples", type=int, default=BOOTSTRAP_RESAMPLES)

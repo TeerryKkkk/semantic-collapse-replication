@@ -14,7 +14,7 @@ cohort_manifest.csv
 requirements.txt
 ```
 
-`cohort_manifest.csv` defines the transcript files used by the released analysis configuration.
+`cohort_manifest.csv` defines the transcript files used by the analysis configuration.
 
 ## Installation
 

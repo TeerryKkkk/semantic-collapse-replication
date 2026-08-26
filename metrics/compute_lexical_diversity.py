@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-compute_lexical_diversity.py - PROMPT experiment version (corrected)
+compute_lexical_diversity.py - Lexical-diversity analysis
 
 Purpose:
 - Compute lexical growth for logs under a user-supplied input directory.
@@ -38,7 +38,7 @@ PROMPT_TYPES = ["t0.9", "diff", "history", "new_open", "reverse"]
 WINDOW_SIZE = 10
 HOP         = WINDOW_SIZE
 
-# ========== Filename parsing (corrected) ==========
+# ========== Filename parsing ==========
 # 1) Match diff / history / new_open / regular / newopen.
 #    model supports arbitrary letters; version supports arbitrary digits.
 RE_PROMPT = re.compile(
