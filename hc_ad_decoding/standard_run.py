@@ -68,12 +68,6 @@ AZURE_CLIENT = ChatCompletionsClient(
     api_version="2024-05-01-preview"
 )
 
-model_name = "Phi-4-3"
-
-
-
-
-
 def _normalize_messages_for_openai(msgs):
     norm = []
     for m in msgs:
@@ -612,7 +606,7 @@ class FreeAgent:
     def __init__(
         self,
         name: str,
-        model: str = "Phi-4-3",
+        model: str,
         *,
         reset_log: bool = True,
     ):
@@ -917,7 +911,7 @@ class FreeAgent:
 # ============== RefereeAgent ==============
 class RefereeAgent:
 
-    def __init__(self, name="Referee", model="Phi-4-3"):
+    def __init__(self, name: str = "Referee", *, model: str):
         self.name = name
         self.model = model
 
@@ -1024,10 +1018,9 @@ class RefereeAgent:
 # ==============  Environment ==============
 class Environment:
 
-    def __init__(self, model="Phi-4-3"):
+    def __init__(self):
         self.agents = []
         self.referee = None
-        self.model = model
         self.round_number = 0
         self.action_log = []
 
@@ -1041,7 +1034,7 @@ class Environment:
                 rst = True
             self.agents.append(FreeAgent(name=name, model=mdl, reset_log=rst))
 
-    def add_referee(self, referee_name: str, model: str = "Phi-4-3"):
+    def add_referee(self, referee_name: str, model: str):
         self.referee = RefereeAgent(name=referee_name, model=model)
 
     def run_round(self):
@@ -1282,7 +1275,7 @@ def load_last_round(log_path=LOG_FILE):
 def load_last_mapping(map_path=MAP_FILE):
 
     if not os.path.exists(map_path):
-        raise RuntimeError("Can not find agents_models.txt for mapping.")
+        raise RuntimeError(f"Can not find mapping file: {map_path}.")
 
     blocks = []
     cur = []
@@ -1304,7 +1297,7 @@ def load_last_mapping(map_path=MAP_FILE):
         blocks.append(cur)
 
     if not blocks:
-        raise RuntimeError("agents_models.txt is empty or no valid mapping found.")
+        raise RuntimeError(f"{map_path} is empty or no valid mapping found.")
 
     last_block = blocks[-1]
     pairs = []
@@ -1401,7 +1394,7 @@ if __name__ == "__main__":
                 mf.write(f"{name}: {model}\n")
             mf.write("\n")
 
-    env = Environment(model=REFEREE_MODEL)
+    env = Environment()
     env.round_number = start_round
     env.add_free_agents(agent_list)
     env.add_referee("Judge", model=REFEREE_MODEL)

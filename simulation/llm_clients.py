@@ -29,12 +29,6 @@ AZURE_CLIENT = ChatCompletionsClient(
     api_version="2024-05-01-preview"
 )
 
-model_name = "Phi-4-3"
-
-
-
-
-
 def _normalize_messages_for_openai(msgs):
     norm = []
     for m in msgs:

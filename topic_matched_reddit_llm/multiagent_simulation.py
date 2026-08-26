@@ -583,7 +583,7 @@ class FreeAgent:
     def __init__(
         self,
         name: str,
-        model: str = "Phi-4-3",
+        model: str,
         *,
         reset_log: bool = True,
     ):
@@ -886,7 +886,7 @@ class FreeAgent:
 # ============== RefereeAgent ==============
 class RefereeAgent:
 
-    def __init__(self, name="Referee", model="Phi-4-3"):
+    def __init__(self, name: str = "Referee", *, model: str):
         self.name = name
         self.model = model
 
@@ -993,10 +993,9 @@ class RefereeAgent:
 # ==============  Environment ==============
 class Environment:
 
-    def __init__(self, model="Phi-4-3"):
+    def __init__(self):
         self.agents = []
         self.referee = None
-        self.model = model
         self.round_number = 0
         self.action_log = []
 
@@ -1010,7 +1009,7 @@ class Environment:
                 rst = True
             self.agents.append(FreeAgent(name=name, model=mdl, reset_log=rst))
 
-    def add_referee(self, referee_name: str, model: str = "Phi-4-3"):
+    def add_referee(self, referee_name: str, model: str):
         self.referee = RefereeAgent(name=referee_name, model=model)
 
     def run_round(self):

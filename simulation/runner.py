@@ -37,7 +37,7 @@ def load_last_round(log_path=LOG_FILE):
 def load_last_mapping(map_path=MAP_FILE):
 
     if not os.path.exists(map_path):
-        raise RuntimeError("Can not find agents_models.txt for mapping.")
+        raise RuntimeError(f"Can not find mapping file: {map_path}.")
 
     blocks = []
     cur = []
@@ -59,7 +59,7 @@ def load_last_mapping(map_path=MAP_FILE):
         blocks.append(cur)
 
     if not blocks:
-        raise RuntimeError("agents_models.txt is empty or no valid mapping found.")
+        raise RuntimeError(f"{map_path} is empty or no valid mapping found.")
 
     last_block = blocks[-1]
     pairs = []
@@ -155,7 +155,7 @@ def main():
                 mf.write(f"{name}: {model}\n")
             mf.write("\n")
 
-    env = Environment(model=REFEREE_MODEL)
+    env = Environment()
     env.round_number = start_round
     env.add_free_agents(agent_list)
     env.add_referee("Judge", model=REFEREE_MODEL)

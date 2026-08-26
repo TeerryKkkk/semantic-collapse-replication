@@ -29,12 +29,12 @@ def main() -> None:
     parser.add_argument(
         "--results",
         type=Path,
-        default=Path("results/embedding_clustering/public"),
+        default=Path("results/embedding_clustering"),
     )
     parser.add_argument(
         "--report",
         type=Path,
-        default=Path("results/embedding_clustering/public/verification.json"),
+        default=Path("results/embedding_clustering/verification.json"),
     )
     parser.add_argument(
         "--refit-selected",

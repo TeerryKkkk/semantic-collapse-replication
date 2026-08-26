@@ -33,9 +33,5 @@ Thumbs.db
 *.svg
 *.tiff
 
-# Retain only compact public result tables
-/results/*
-!/results/embedding_clustering/
-/results/embedding_clustering/*
-!/results/embedding_clustering/public/
-!/results/embedding_clustering/public/**
+# Generated analysis outputs
+/results/

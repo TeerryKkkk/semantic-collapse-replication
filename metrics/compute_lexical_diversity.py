@@ -7,9 +7,9 @@ Purpose:
 - Compute lexical growth for logs under a user-supplied input directory.
 - Support filename formats:
     deepseek_diff_V1.txt
-    deepseek_newopen_V4.txt  (supports newopen)
+    deepseek_newopen_V1.txt  (supports newopen)
     gpt_REGULAR_V2.txt       (supports regular -> mapped to t0.9)
-    phi0.9_V3.txt            (supports legacy format)
+    phi0.9_V3.txt            (supports temperature 0.9 format)
 
 Outputs in the user-supplied output directory:
         ├── {model}_cumulative.png
@@ -45,7 +45,7 @@ RE_PROMPT = re.compile(
     r"^(?P<model>[A-Za-z]+)_(?P<ptype>diff|history|new_open|newopen|regular|reverse)_V(?P<ver>\d+)\.txt$",
     re.IGNORECASE,
 )
-# 2) baseline (legacy temperature 0.9 format): deepseek0.9_V1.txt
+# 2) baseline temperature 0.9 format: deepseek0.9_V1.txt
 RE_STD = re.compile(
     r"^(?P<model>[A-Za-z]+)0\.9_V(?P<ver>\d+)\.txt$",
     re.IGNORECASE,
