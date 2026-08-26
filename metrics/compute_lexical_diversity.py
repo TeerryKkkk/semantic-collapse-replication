@@ -4,15 +4,14 @@
 compute_lexical_diversity.py - PROMPT experiment version (corrected)
 
 Purpose:
-- Compute lexical growth for logs under PROMPT_RESULTS/.
+- Compute lexical growth for logs under a user-supplied input directory.
 - Support filename formats:
     deepseek_diff_V1.txt
     deepseek_newopen_V4.txt  (supports newopen)
     gpt_REGULAR_V2.txt       (supports regular -> mapped to t0.9)
     phi0.9_V3.txt            (supports legacy format)
 
-Outputs:
-    PROMPT_LEXICAL_OUT/
+Outputs in the user-supplied output directory:
         ├── {model}_cumulative.png
         ├── {model}_diff.png
         ├── CUMULATIVE_ALL.csv
@@ -21,6 +20,7 @@ Outputs:
 
 from __future__ import annotations
 
+import argparse
 import re
 import pathlib
 import unicodedata
@@ -30,9 +30,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # ========== Basic config ==========
-INPUT_DIR = "PROMPT_RESULTS"      # txt log directory
-OUT_DIR   = "PROMPT_LEXICAL_OUT"  # output directory for images and CSV files
-
 MODELS       = ["deepseek", "gpt", "phi"]
 # Note: regular is mapped to t0.9, so this list uses t0.9.
 PROMPT_TYPES = ["t0.9", "diff", "history", "new_open", "reverse"]
@@ -228,12 +225,21 @@ def get_curve(path: pathlib.Path, kind: str):
     return x, y
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input-dir", type=pathlib.Path, required=True)
+    parser.add_argument("--output-dir", type=pathlib.Path, required=True)
+    return parser.parse_args()
+
+
 def main():
-    in_dir = pathlib.Path(INPUT_DIR)
+    args = parse_args()
+    in_dir = args.input_dir
+    out_dir = args.output_dir
     if not in_dir.exists():
         raise SystemExit(f"Input directory does not exist: {in_dir.resolve()}")
 
-    ensure_dir(pathlib.Path(OUT_DIR))
+    ensure_dir(out_dir)
 
     all_txt = sorted(p for p in in_dir.rglob("*.txt"))
     if not all_txt:
@@ -359,12 +365,11 @@ def main():
 
             plt.tight_layout()
             plt.legend(ncol=2, fontsize=8)
-            out_png = pathlib.Path(OUT_DIR) / f"{model}_{kind}.png"
+            out_png = out_dir / f"{model}_{kind}.png"
             plt.savefig(out_png, dpi=300)
             plt.close()
             print(f"✅ Saved: {out_png}")
 
-    out_dir = pathlib.Path(OUT_DIR)
     if CUM_ROWS:
         pd.DataFrame(CUM_ROWS).to_csv(out_dir / "CUMULATIVE_ALL.csv", index=False)
         print(f"📝 Wrote {out_dir / 'CUMULATIVE_ALL.csv'}")

@@ -8,16 +8,17 @@ Window-to-Previous Centroid Similarity (TF-IDF or Embedding)
 - Compare each window's centroid to the **previous window**'s centroid
 
 # === HOW TO USE ===
-1) Put your txt next to this script, or set INPUT_PATH to an absolute path.
-2) Set CONFIG below:
+1) Supply an input log and output directory on the command line.
+2) Set scientific CONFIG below:
    - REPRESENTATION = "tfidf" or "embedding"
    - BACKEND = "sbert" (uses all-MiniLM-L6-v2) or "lsa" (no-internet fallback)
    - WINDOW_SIZE, HOP (set HOP==WINDOW_SIZE for non-overlap: e.g., 5 means 1-5 vs 6-10)
    - DROP_INCOMPLETE_TAIL = True to drop trailing partial window
-3) Run:  python compute_within_run_semantic_similarity.py
-Outputs: CSV + PNG in OUTPUT_DIR
+3) Run: python compute_within_run_semantic_similarity.py --input-path FILE --output-dir PATH
+Outputs: CSV + PNG in the supplied output directory.
 """
 
+import argparse
 import re
 from typing import List, Tuple, Dict
 from pathlib import Path
@@ -35,9 +36,6 @@ from openai import OpenAI
 # =====================
 # ====== CONFIG =======
 # =====================
-INPUT_PATH = "deepseek0.9_V2.txt"         # e.g., "C:/path/DEEPSEEK_TEST.txt"
-OUTPUT_NAME = "deepseek0.9_V20"
-OUTPUT_DIR = "."                         # directory to save outputs
 WINDOW_SIZE = 10
 HOP = WINDOW_SIZE                                 # use 5 for 1–5, 6–10, 11–15, ...
 DROP_INCOMPLETE_TAIL = False              # drop last short window
@@ -345,7 +343,17 @@ def compare_vs_first(win_vecs: np.ndarray):
         sims[i] = float(np.dot(win_vecs[i], first_vec))
     return sims
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input-path", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--output-name", default=None)
+    return parser.parse_args()
+
 def main():
+    args = parse_args()
+    output_name = args.output_name or args.input_path.stem
+
     print(f"[config] REPRESENTATION={REPRESENTATION}")
     if REPRESENTATION == "embedding":
         print(f"[config] EMBED_BACKEND={EMBED_BACKEND}")
@@ -354,7 +362,7 @@ def main():
         elif EMBED_BACKEND == "openai":
             print(f"[config] OPENAI_EMBED_MODEL={OPENAI_EMBED_MODEL}")
     # Load
-    p = Path(INPUT_PATH)
+    p = args.input_path
     if not p.exists():
         raise FileNotFoundError(f"File not found: {p.resolve()}")
     text = p.read_text(encoding="utf-8", errors="ignore")
@@ -406,14 +414,14 @@ def main():
             "sim_vs_first": sims_vs_first[idx],          # each window vs first window
         })
     df = pd.DataFrame(rows)
-    df["source"] = OUTPUT_NAME           # Add source to detail rows.
+    df["source"] = output_name           # Add source to detail rows.
 
     # Save outputs
-    out_dir = Path(OUTPUT_DIR)
+    out_dir = args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
     tail = (BACKEND if rep=="embedding" else "tfidf")
-    csv_path = out_dir / f"{OUTPUT_NAME}__win_centroid_{rep}_{tail}_w{WINDOW_SIZE}_hop{HOP}.csv"   # Prefix with OUTPUT_NAME.
-    png_path = out_dir / f"{OUTPUT_NAME}.png"
+    csv_path = out_dir / f"{output_name}__win_centroid_{rep}_{tail}_w{WINDOW_SIZE}_hop{HOP}.csv"   # Prefix with output_name.
+    png_path = out_dir / f"{output_name}.png"
 
     df.to_csv(csv_path, index=False)
 
@@ -430,7 +438,7 @@ def main():
         'cosine_first_last': first_last,
         'adjacent_mean': adj_mean,
     }])
-    summary_path = out_dir / f"{OUTPUT_NAME}__summary_{rep}_{tail}_w{WINDOW_SIZE}_hop{HOP}.csv"     # Prefix with OUTPUT_NAME.
+    summary_path = out_dir / f"{output_name}__summary_{rep}_{tail}_w{WINDOW_SIZE}_hop{HOP}.csv"     # Prefix with output_name.
     summary_df.to_csv(summary_path, index=False)
 
     # Plot
