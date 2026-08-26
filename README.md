@@ -26,14 +26,6 @@ For the full experimental design, data construction, analysis definitions, and i
 
 Each analysis directory contains its own entry points and, where needed, a module-specific `requirements.txt`.
 
-## Data and generated artifacts
-
-Raw interaction transcripts, third-party source datasets, large embedding matrices, embedding caches, and other large generated artifacts are not stored in this repository unless explicitly included as lightweight public analysis files.
-
-The corresponding data sources, cohort definitions, and availability information are described in the manuscript.
-
-Analysis scripts generally accept local input paths or expect data in the module-specific locations documented in their README files.
-
 ## API credentials
 
 No API credentials are stored in this repository.
