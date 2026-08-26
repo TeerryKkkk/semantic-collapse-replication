@@ -6,9 +6,9 @@ import statsmodels.formula.api as smf
 # =========================
 # Config (edit here)
 # =========================
-WITHIN_PATH = "WITHIN_final_version.csv"
-CROSS_PATH = "CROSS_final_version.csv"
-OUT_DIR = "factorwise_window_regression_out_v6_factorwise_holm_finalversion"
+WITHIN_PATH = "within_metrics.csv"
+CROSS_PATH = "cross_metrics.csv"
+OUT_DIR = "factorwise_regression_results"
 
 WINDOW_SPECS = ["late5", "global"]
 LATE5 = list(range(16, 21))

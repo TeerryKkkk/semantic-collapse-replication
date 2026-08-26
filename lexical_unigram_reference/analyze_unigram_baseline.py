@@ -129,7 +129,7 @@ def tokenise(text: str) -> list[str]:
 
 
 def parse_log_fuzzy(path: pathlib.Path) -> tuple[Dict[int, Dict[str, List[str]]], str, int]:
-    """Parse generated utterances using the historical transcript formats."""
+    """Parse generated utterances using the supported transcript formats."""
     text = path.read_text(encoding="utf-8", errors="ignore")
     per_round: Dict[int, Dict[str, List[str]]] = {}
     hits = 0

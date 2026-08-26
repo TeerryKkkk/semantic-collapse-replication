@@ -295,7 +295,7 @@ def run_one(row: dict, *, model_key: str, output_root: Path, providers: Provider
     try:
         with pushd(run_dir):
             random.seed(SIMULATION_SEED)
-            environment = MatchedEnvironment(model=REFEREE_MODEL)
+            environment = MatchedEnvironment()
             environment.add_free_agents(agent_list)
             environment.add_referee("Judge", model=REFEREE_MODEL)
             with (run_dir / "transcript.txt").open("w", encoding="utf-8") as transcript, contextlib.redirect_stdout(transcript):

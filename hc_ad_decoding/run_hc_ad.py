@@ -162,7 +162,7 @@ def run(args: argparse.Namespace) -> None:
         for name, model in agent_list:
             handle.write(f"{name}: {model}\n")
 
-    environment = environment_class(model="gpt-4o-mini")
+    environment = environment_class()
     environment.add_free_agents(agent_list)
     environment.add_referee("Judge", model="gpt-4o-mini")
 

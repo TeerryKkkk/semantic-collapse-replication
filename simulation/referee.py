@@ -10,7 +10,7 @@ from .llm_clients import call_llm
 # ============== RefereeAgent ==============
 class RefereeAgent:
 
-    def __init__(self, name="Referee", model="Phi-4-3"):
+    def __init__(self, name: str = "Referee", *, model: str):
         self.name = name
         self.model = model
 

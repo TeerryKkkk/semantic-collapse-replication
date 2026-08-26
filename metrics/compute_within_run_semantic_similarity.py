@@ -12,7 +12,7 @@
 1) Supply an input log and output directory on the command line.
 2) Set scientific CONFIG below:
    - REPRESENTATION = "tfidf" or "embedding"
-   - BACKEND = "sbert" (uses all-MiniLM-L6-v2) or "lsa" (no-internet fallback)
+   - Embedding mode uses OpenAI text-embedding-3-large.
    - WINDOW_SIZE, HOP (set HOP==WINDOW_SIZE for non-overlap: e.g., 5 means 1-5 vs 6-10)
    - DROP_INCOMPLETE_TAIL = True to drop trailing partial window
 3) Run: python compute_within_run_semantic_similarity.py --input-path FILE --output-dir PATH
@@ -31,7 +31,6 @@ import matplotlib.pyplot as plt
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import normalize as l2norm
-from sklearn.decomposition import TruncatedSVD
 
 from openai import OpenAI
 # =====================
@@ -41,16 +40,7 @@ WINDOW_SIZE = 10
 HOP = WINDOW_SIZE                                 # use 5 for 1–5, 6–10, 11–15, ...
 DROP_INCOMPLETE_TAIL = False              # drop last short window
 
-# Representation switches
-BACKEND = "openai"                        # if embedding: "sbert" or "lsa"
-SBERT_MODEL = "" #BAAI/bge-large-en-v1.5 or sentence-transformers/all-MiniLM-L6-v2 or intfloat/e5-large-v2
-
-
-
 REPRESENTATION = "embedding"
-EMBED_BACKEND = "openai"        # "local" | "openai" | "lsa"
-
-EMBED_MODEL_NAME = ""
 
 # OpenAI embedding settings
 OPENAI_EMBED_MODEL = "text-embedding-3-large"
@@ -71,9 +61,6 @@ TFIDF_PARAMS = dict(
     max_df=0.9,
     min_df=1,
 )
-
-# LSA embedding size (if BACKEND="lsa")
-N_COMPONENTS_LSA = 128
 
 # =====================
 # ====== LOGIC ========
@@ -289,47 +276,17 @@ def _embed_with_openai(text: str) -> np.ndarray:
 
 
 def build_embeddings(corpus: List[str]):
-    # ====== 1) OpenAI branch ======
-    if EMBED_BACKEND.lower() == "openai":
-        all_vecs = []
-        for txt in corpus:
-            v = _embed_with_openai(txt)
-            all_vecs.append(v)
-        E = np.vstack(all_vecs).astype("float32")
-        # L2-normalize embedding rows.
-        E = E / (np.linalg.norm(E, axis=1, keepdims=True) + 1e-12)
-        print(f"[OPENAI] using model: {OPENAI_EMBED_MODEL}, got shape={E.shape}")
-        return E
+    all_vecs = []
+    for txt in corpus:
+        v = _embed_with_openai(txt)
+        all_vecs.append(v)
+    E = np.vstack(all_vecs).astype("float32")
+    # L2-normalize embedding rows.
+    E = E / (np.linalg.norm(E, axis=1, keepdims=True) + 1e-12)
+    print(f"[OPENAI] using model: {OPENAI_EMBED_MODEL}, got shape={E.shape}")
+    return E
 
-    # ====== 2) Original local SBERT / LSA branch ======
-    backend = BACKEND.lower()
-    if backend == "sbert":
-        try:
-            from sentence_transformers import SentenceTransformer
-            model = SentenceTransformer(SBERT_MODEL)
-            emb = model.encode(
-                corpus,
-                batch_size=64,
-                normalize_embeddings=True,
-                show_progress_bar=False,
-            )
-            print(f"[SBERT] using model: {SBERT_MODEL}, got shape={emb.shape}")
-            return emb
-        except Exception as e:
-            print(f"[WARN] SBERT failed ({e}); falling back to LSA.")
-            backend = "lsa"
 
-    if backend == "lsa":
-        tfidf = TfidfVectorizer(**TFIDF_PARAMS).fit(corpus)
-        X = tfidf.transform(corpus)
-        n_features = int(X.shape[1])
-        n_comp = max(2, min(N_COMPONENTS_LSA, max(2, n_features - 1)))
-        svd = TruncatedSVD(n_components=n_comp, random_state=42)
-        E = svd.fit_transform(X)
-        E = l2norm(E, norm="l2", axis=1)
-        return E
-
-    raise ValueError(f"Unknown BACKEND: {BACKEND}")
 def compare_vs_first(win_vecs: np.ndarray):
     """
     Return an array where sims[i] = cosine(win[i], win[0]) for all i.
@@ -357,11 +314,7 @@ def main():
 
     print(f"[config] REPRESENTATION={REPRESENTATION}")
     if REPRESENTATION == "embedding":
-        print(f"[config] EMBED_BACKEND={EMBED_BACKEND}")
-        if EMBED_BACKEND == "local":
-            print(f"[config] EMBED_MODEL_NAME={EMBED_MODEL_NAME}")
-        elif EMBED_BACKEND == "openai":
-            print(f"[config] OPENAI_EMBED_MODEL={OPENAI_EMBED_MODEL}")
+        print(f"[config] OPENAI_EMBED_MODEL={OPENAI_EMBED_MODEL}")
     # Load
     p = args.input_path
     if not p.exists():
@@ -420,7 +373,7 @@ def main():
     # Save outputs
     out_dir = args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
-    tail = (BACKEND if rep=="embedding" else "tfidf")
+    tail = ("openai" if rep=="embedding" else "tfidf")
     csv_path = out_dir / f"{output_name}__win_centroid_{rep}_{tail}_w{WINDOW_SIZE}_hop{HOP}.csv"   # Prefix with output_name.
     png_path = out_dir / f"{output_name}.png"
 

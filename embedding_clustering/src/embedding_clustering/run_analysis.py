@@ -271,7 +271,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("results/embedding_clustering/public"),
+        default=Path("results/embedding_clustering"),
     )
     parser.add_argument(
         "--validate-only",

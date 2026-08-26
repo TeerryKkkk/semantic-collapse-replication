@@ -9,14 +9,13 @@ For the scientific motivation, clustering specification, and interpretation of t
 ## Structure
 
 ```text
-data/
+data/embedding_manifest.csv
 scripts/
 src/embedding_clustering/
-results/embedding_clustering/public/
 requirements.txt
 ```
 
-The repository includes the embedding manifest and lightweight public result summaries. The large embedding matrix itself is not stored in the repository.
+The repository includes the embedding manifest and clustering code. The large embedding matrix and generated clustering outputs are not included.
 
 ## Installation
 
@@ -32,7 +31,7 @@ From this directory:
 python scripts/run_embedding_clustering.py \
     --embeddings /path/to/embeddings_l2.npy \
     --manifest data/embedding_manifest.csv \
-    --output results/embedding_clustering/public
+    --output /path/to/output
 ```
 
 The input embedding matrix must correspond to the supplied manifest.
@@ -45,16 +44,10 @@ Input and result verification utilities are available through:
 scripts/verify_embedding_clustering.py
 ```
 
-When the corresponding embedding matrix is available, the included summaries can be checked with the verification script.
+When the corresponding embedding matrix and locally generated outputs are available, they can be checked with the verification script.
 
-## Public outputs
+## Generated outputs
 
-Lightweight analysis outputs included in the repository are stored under:
-
-```text
-results/embedding_clustering/public/
-```
-
-These include cluster assignments, cluster-selection summaries, family-level summaries, and run/phase association results.
+The clustering script writes cluster assignments, cluster-selection summaries, family-level summaries, and run/phase association results to the directory specified by `--output`.
 
 For additional methodological details, see the manuscript.

@@ -37,8 +37,6 @@ data/llm/
 
 using the filenames defined by the preprocessing module.
 
-Large transcript files and embedding caches are not stored in the repository.
-
 ## Running
 
 From this directory:

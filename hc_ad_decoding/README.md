@@ -54,6 +54,4 @@ Each replicate is written to a separate run directory.
 
 Credentials required by the host simulation are supplied through environment variables.
 
-Runtime transcripts, retrieval data, and memory records are written inside the selected run directory and are not committed to the repository.
-
 For the full HC-AD configuration and analysis of the intervention, see the manuscript.

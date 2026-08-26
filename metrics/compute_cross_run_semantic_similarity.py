@@ -109,7 +109,7 @@ def parse_round_texts(path: Path) -> Dict[int, str]:
                 if idx != -1:
                     payload = line[idx + len("said:"):].strip()
 
-                    # Original logic: remove paired leading/trailing quotes.
+                    # Remove paired leading/trailing quotes.
                     if len(payload) >= 2 and payload[0] == payload[-1] and payload[0] in ("'", '"'):
                         payload = payload[1:-1].strip()
 

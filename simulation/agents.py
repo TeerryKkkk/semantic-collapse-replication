@@ -55,7 +55,7 @@ class FreeAgent:
     def __init__(
         self,
         name: str,
-        model: str = "Phi-4-3",
+        model: str,
         *,
         reset_log: bool = True,
     ):
