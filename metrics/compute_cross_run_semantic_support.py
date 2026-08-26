@@ -2,12 +2,13 @@
 Cache-only cross-run semantic support / concentration analysis.
 
 This script intentionally does not import OpenAI, read an API key, or recompute
-embeddings. It uses the message-level metadata CSV and embedding NPY cache files
-created by compute_embedding_diversity_vendi.py.
+embeddings. It uses compatible message-level metadata CSV and embedding NPY
+cache files supplied via --cache-dir.
 """
 
 from __future__ import annotations
 
+import argparse
 from dataclasses import dataclass
 from itertools import combinations
 from pathlib import Path
@@ -20,10 +21,6 @@ import pandas as pd
 # =====================
 # ====== CONFIG =======
 # =====================
-
-OUTPUT_DIR = Path("EMBEDDING_DIVERSITY_RESULTS")
-CACHE_DIR = OUTPUT_DIR / "cache"
-CROSS_RUN_DIR = OUTPUT_DIR / "cross_run"
 
 EXPECTED_DIM = 3072
 EXPECTED_EMBEDDING_MODEL = "text-embedding-3-large"
@@ -55,7 +52,7 @@ class CacheSpec:
     embeddings_path: Path
 
 
-def build_cache_specs() -> List[CacheSpec]:
+def build_cache_specs(cache_dir: Path) -> List[CacheSpec]:
     specs: List[CacheSpec] = []
     for model_family, prefix, versions in MODEL_FAMILY_SPECS:
         for version in versions:
@@ -66,8 +63,8 @@ def build_cache_specs() -> List[CacheSpec]:
                     stem=stem,
                     source_file=f"{stem}.txt",
                     run_id=f"v{version}",
-                    metadata_path=CACHE_DIR / f"{stem}_metadata.csv",
-                    embeddings_path=CACHE_DIR / f"{stem}_embeddings.npy",
+                    metadata_path=cache_dir / f"{stem}_metadata.csv",
+                    embeddings_path=cache_dir / f"{stem}_embeddings.npy",
                 )
             )
     return specs
@@ -470,7 +467,7 @@ def summarize_reference_comparisons(centroids: np.ndarray, centroid_metadata: pd
     return pd.DataFrame(rows)
 
 
-def write_figures(metrics: pd.DataFrame, family_summary: pd.DataFrame) -> None:
+def write_figures(metrics: pd.DataFrame, family_summary: pd.DataFrame, output_dir: Path) -> None:
     if not MAKE_FIGURES:
         return
 
@@ -501,7 +498,7 @@ def write_figures(metrics: pd.DataFrame, family_summary: pd.DataFrame) -> None:
     plt.grid(True, linestyle="--", alpha=0.3)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(CROSS_RUN_DIR / "cross_run_distance_trajectory.png", dpi=180)
+    plt.savefig(output_dir / "cross_run_distance_trajectory.png", dpi=180)
     plt.close()
 
     plt.figure(figsize=(9, 5))
@@ -520,7 +517,7 @@ def write_figures(metrics: pd.DataFrame, family_summary: pd.DataFrame) -> None:
     plt.grid(True, linestyle="--", alpha=0.3)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(CROSS_RUN_DIR / "cross_run_vendi_norm_trajectory.png", dpi=180)
+    plt.savefig(output_dir / "cross_run_vendi_norm_trajectory.png", dpi=180)
     plt.close()
 
     plt.figure(figsize=(7, 5))
@@ -537,7 +534,7 @@ def write_figures(metrics: pd.DataFrame, family_summary: pd.DataFrame) -> None:
     plt.title("Mean cross-run semantic distance")
     plt.grid(True, axis="y", linestyle="--", alpha=0.3)
     plt.tight_layout()
-    plt.savefig(CROSS_RUN_DIR / "cross_run_family_summary_bar.png", dpi=180)
+    plt.savefig(output_dir / "cross_run_family_summary_bar.png", dpi=180)
     plt.close()
 
 
@@ -550,17 +547,18 @@ def write_outputs(
     pair_distribution: pd.DataFrame,
     pair_summary: pd.DataFrame,
     reference_summary: pd.DataFrame,
+    output_dir: Path,
 ) -> None:
-    CROSS_RUN_DIR.mkdir(parents=True, exist_ok=True)
-    audit_df.to_csv(CROSS_RUN_DIR / "cross_run_cache_audit.csv", index=False)
-    np.save(CROSS_RUN_DIR / "window_centroids.npy", centroids.astype(np.float32, copy=False))
-    centroid_metadata.to_csv(CROSS_RUN_DIR / "window_centroid_metadata.csv", index=False)
-    metrics.to_csv(CROSS_RUN_DIR / "cross_run_window_metrics.csv", index=False)
-    family_summary.to_csv(CROSS_RUN_DIR / "cross_run_family_summary.csv", index=False)
-    pair_distribution.to_csv(CROSS_RUN_DIR / "cross_run_pair_distribution.csv", index=False)
-    pair_summary.to_csv(CROSS_RUN_DIR / "cross_run_pair_summary.csv", index=False)
-    reference_summary.to_csv(CROSS_RUN_DIR / "cross_run_reference_summary.csv", index=False)
-    write_figures(metrics, family_summary)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    audit_df.to_csv(output_dir / "cross_run_cache_audit.csv", index=False)
+    np.save(output_dir / "window_centroids.npy", centroids.astype(np.float32, copy=False))
+    centroid_metadata.to_csv(output_dir / "window_centroid_metadata.csv", index=False)
+    metrics.to_csv(output_dir / "cross_run_window_metrics.csv", index=False)
+    family_summary.to_csv(output_dir / "cross_run_family_summary.csv", index=False)
+    pair_distribution.to_csv(output_dir / "cross_run_pair_distribution.csv", index=False)
+    pair_summary.to_csv(output_dir / "cross_run_pair_summary.csv", index=False)
+    reference_summary.to_csv(output_dir / "cross_run_reference_summary.csv", index=False)
+    write_figures(metrics, family_summary, output_dir)
 
 
 def print_audit_summary(audit_df: pd.DataFrame) -> None:
@@ -611,12 +609,21 @@ def print_final_summary(
     print(reference_summary.to_string(index=False))
 
 
-def main() -> None:
-    CROSS_RUN_DIR.mkdir(parents=True, exist_ok=True)
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--cache-dir", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    return parser.parse_args()
 
-    specs = build_cache_specs()
+
+def main() -> None:
+    args = parse_args()
+    output_dir = args.output_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    specs = build_cache_specs(args.cache_dir)
     audit_df, selected_specs = audit_cache(specs)
-    audit_df.to_csv(CROSS_RUN_DIR / "cross_run_cache_audit.csv", index=False)
+    audit_df.to_csv(output_dir / "cross_run_cache_audit.csv", index=False)
     print_audit_summary(audit_df)
     require_valid_audit(audit_df)
 
@@ -635,10 +642,11 @@ def main() -> None:
         pair_distribution,
         pair_summary,
         reference_summary,
+        output_dir,
     )
     print_final_summary(selected_specs, family_summary, reference_summary)
 
-    print(f"[OK] wrote outputs to {CROSS_RUN_DIR}")
+    print(f"[OK] wrote outputs to {output_dir}")
 
 
 if __name__ == "__main__":

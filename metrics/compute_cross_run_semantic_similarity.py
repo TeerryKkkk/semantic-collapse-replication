@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-One-off analysis of multiple log files from the same model.
+Cross-run analysis of multiple log files from the same model.
 Outputs cross-file TF-IDF document cosine, Jaccard metrics,
 per-file adjacent-window lexical growth, and plots.
 
 """
 
 from __future__ import annotations
+import argparse
 import os
 import re
 import math
@@ -18,13 +19,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # ============ Config ============
-LOG_FILES: List[str] = [
-    "deepseek0.9_V1.txt",
-    "deepseek0.9_V2.txt",
-]
-
-OUTPUT_DIR = "111111phi"   # Suggested: name by model, e.g. outputs_phi-4_tfidf
-
 # Embedding parameters used when VECTOR_MODE='embed'.
 # Chinese option: 'BAAI/bge-small-zh-v1.5'; multilingual options: 'intfloat/multilingual-e5-small' or 'paraphrase-multilingual-MiniLM-L12-v2'.
 VECTOR_MODE = "embed_openai"   # "embed_local" / "embed_openai" / "tfidf"
@@ -194,14 +188,24 @@ def jaccard_bigrams(a_tokens: List[str], b_tokens: List[str]) -> float:
     return float(len(Ab & Bb) / U) if U > 0 else math.nan
 
 # ============ Main flow ============
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input-files", type=Path, nargs="+", required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
+    output_dir = args.output_dir
+
     # 0. Output directory
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
     # 1. Collect log files
-    files = [Path(p) for p in LOG_FILES if Path(p).exists()]
+    files = [p for p in args.input_files if p.exists()]
     if not files:
-        raise SystemExit("Please add existing log file paths to LOG_FILES.")
+        raise SystemExit("None of the supplied --input-files exist.")
 
     # 2. Parse all logs -> {path: {round_id: text}}
     parsed: Dict[Path, Dict[int, str]] = {}
@@ -215,7 +219,7 @@ def main():
         max_r, missing, line = report_rounds(rt, p.name)
         check_lines.append(line)
         max_round_global = max(max_round_global, max_r)
-    (Path(OUTPUT_DIR) / "checks.txt").write_text("\n".join(check_lines), encoding="utf-8")
+    (output_dir / "checks.txt").write_text("\n".join(check_lines), encoding="utf-8")
     print("\n".join(check_lines))
 
     # 3. Align windows
@@ -422,7 +426,7 @@ def main():
             ]
 
     # 7. Write pairwise_curves.csv.
-    pairwise_csv = Path(OUTPUT_DIR) / "pairwise_curves.csv"
+    pairwise_csv = output_dir / "pairwise_curves.csv"
     pd.DataFrame(pair_rows).to_csv(pairwise_csv, index=False)
     print(f"[done] pairwise curves -> {pairwise_csv}")
     # --- NEW: save averaged (weighted) curve for the primary metric
@@ -440,8 +444,8 @@ def main():
     if avg_rows:
         pd.DataFrame(avg_rows, columns=["window_id", "weighted_mean"])\
         .sort_values("window_id")\
-        .to_csv(Path(OUTPUT_DIR) / "weighted_mean_primary.csv", index=False)
-        print("[done] weighted mean (primary) ->", Path(OUTPUT_DIR) / "weighted_mean_primary.csv")
+        .to_csv(output_dir / "weighted_mean_primary.csv", index=False)
+        print("[done] weighted mean (primary) ->", output_dir / "weighted_mean_primary.csv")
 
     # 8. Lexical growth.
     growth_rows: List[dict] = []
@@ -463,13 +467,13 @@ def main():
             ))
             prev_uni, prev_bi = uni, bi
 
-    growth_csv = Path(OUTPUT_DIR) / "perfile_vocab_growth.csv"
+    growth_csv = output_dir / "perfile_vocab_growth.csv"
     pd.DataFrame(growth_rows).to_csv(growth_csv, index=False)
     print(f"[done] per-file vocab growth -> {growth_csv}")
 
     # 9. Plot.
     curves = pd.DataFrame(pair_rows)
-    plots_dir = Path(OUTPUT_DIR) / "plots"
+    plots_dir = output_dir / "plots"
     plots_dir.mkdir(parents=True, exist_ok=True)
 
     def plot_metric(metric: str, title: str):
