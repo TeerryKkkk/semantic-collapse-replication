@@ -28,7 +28,7 @@ from hc_ad_integration import (
 
 BUNDLED_HOST_PATH = Path(__file__).with_name("standard_run.py")
 STANDARD_RUN_SHA256 = (
-    "b697947a4a10485eac65dd64cae85c4984bb06a69ba360e600fac900aa3db7be"
+    "f0de7b00c9fc365cbc36466cacdcd3444deeb833cb08fab99d30974f94e8f007"
 )
 
 
