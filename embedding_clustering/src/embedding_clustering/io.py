@@ -66,12 +66,12 @@ def load_inputs(
     manifest_hash = sha256_file(manifest_path)
     if check_hashes and matrix_hash != EXPECTED_MATRIX_SHA256:
         raise ValueError(
-            "Embedding matrix SHA-256 does not match the audited manuscript input: "
+            "Embedding matrix SHA-256 does not match the expected input: "
             f"{matrix_hash}"
         )
     if check_hashes and manifest_hash != EXPECTED_MANIFEST_SHA256:
         raise ValueError(
-            "Manifest SHA-256 does not match the audited manuscript input: "
+            "Manifest SHA-256 does not match the expected input: "
             f"{manifest_hash}"
         )
 

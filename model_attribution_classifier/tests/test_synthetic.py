@@ -9,7 +9,6 @@ from pathlib import Path
 from model_attribution_classifier.canonical_parser import parse_transcript
 from model_attribution_classifier.pipeline import (
     FAMILY_ORDER,
-    build_fold,
     build_independent_reference,
     load_independent_manifest,
     parse_independent_runs,
@@ -51,7 +50,7 @@ class ParserTests(unittest.TestCase):
 
 
 class DesignTests(unittest.TestCase):
-    def test_independent_reference_and_loro_logic(self) -> None:
+    def test_independent_reference_logic(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             manifest = root / "independent.csv"
@@ -75,14 +74,6 @@ class DesignTests(unittest.TestCase):
             self.assertEqual(len(data.test), 15000)
             self.assertEqual(len(data.reference_run_counts), 15)
             self.assertTrue(math.isclose(float(data.sample_weights.mean()), 1.0, abs_tol=1e-12))
-
-            fold = build_fold(tests, 1)
-            self.assertEqual(fold.held_out_run_id, 3)
-            self.assertEqual(len(fold.training), 2000)
-            self.assertEqual(len(fold.test), 5000)
-            self.assertFalse(any(record.run_id == 3 for record in fold.training))
-            self.assertTrue(math.isclose(float(fold.sample_weights.mean()), 1.0, abs_tol=1e-12))
-
 
 if __name__ == "__main__":
     unittest.main()

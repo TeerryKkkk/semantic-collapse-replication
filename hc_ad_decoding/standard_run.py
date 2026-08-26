@@ -565,7 +565,7 @@ class MemoryStore:
 
 
 
-RECENT_TOKEN_LIMIT = 0      # This function has been deprecated; set to 0 to disable.
+RECENT_TOKEN_LIMIT = 0      # Set to 0 to disable this feature.
 
 
 class FreeAgent:

@@ -26,7 +26,7 @@ python sample_reddit_discussions.py \
     --selection paper
 ```
 
-The released thread manifest is stored in:
+The manifest identifying the selected discussion threads is included at:
 
 ```text
 manifests/paper_threads.csv
