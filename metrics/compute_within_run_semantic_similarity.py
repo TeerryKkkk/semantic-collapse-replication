@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-"""
-Window-to-Previous Centroid Similarity (TF-IDF or Embedding)
------------------------------------------------------------
-- Split chat log by headers like: "===== Round N order: ... ====="
-- Build per-round vectors via TF-IDF or Embedding
-- Aggregate **non-overlapping** windows: [1..W], [W+1..2W], ...
-- Compare each window's centroid to the **previous window**'s centroid
+"""Within-run semantic similarity (TF-IDF or embedding)
+
+- Parse the interaction transcript by round.
+- Construct non-overlapping interaction intervals.
+- In TF-IDF mode, aggregate round-level vectors within each interval.
+- In embedding mode, directly embed the concatenated text of each interval.
+- Compute cosine similarity relative to both the preceding interval and the
+  first interval.
 
 # === HOW TO USE ===
 1) Supply an input log and output directory on the command line.
@@ -381,18 +382,18 @@ def main():
 
     # 2) Build window vectors by representation mode.
     if rep == "tfidf":
-        # Original logic: build TF-IDF by round, then compute window centroids.
+        # TF-IDF mode: build round-level vectors and aggregate interval centroids.
         X_round = build_tfidf(corpus)                    # sparse L2
         win_vecs = window_centroids(X_round, windows)    # dense L2
     elif rep == "embedding":
-        # Option A: embed each window text directly, one OpenAI request per window.
+        # Embedding mode: embed each concatenated interval text directly.
         window_texts = build_window_texts(corpus, windows)
         win_vecs = build_embeddings(window_texts)        # dense L2; each row is one window
         print(f"[INFO] built window embeddings, shape={win_vecs.shape}")
     else:
         raise ValueError("REPRESENTATION must be 'tfidf' or 'embedding'")
 
-    # 3) Keep similarity calculation unchanged.
+    # 3) Compute similarity to the preceding and first intervals.
     sims = compare_adjacent(win_vecs)                    # vs previous window
     sims_vs_first = compare_vs_first(win_vecs)           # vs first window
     first_last = compare_first_last(win_vecs)            # first vs last (global)

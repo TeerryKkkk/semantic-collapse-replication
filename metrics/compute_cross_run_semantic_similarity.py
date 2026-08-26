@@ -429,7 +429,7 @@ def main():
     pairwise_csv = output_dir / "pairwise_curves.csv"
     pd.DataFrame(pair_rows).to_csv(pairwise_csv, index=False)
     print(f"[done] pairwise curves -> {pairwise_csv}")
-    # --- NEW: save averaged (weighted) curve for the primary metric
+    # Save an auxiliary weighted summary for the configured similarity metric.
     curves = pd.DataFrame(pair_rows)
     primary_name = "tfidf_cosine" if VECTOR_MODE == "tfidf" else "embed_cosine"
 
@@ -444,8 +444,8 @@ def main():
     if avg_rows:
         pd.DataFrame(avg_rows, columns=["window_id", "weighted_mean"])\
         .sort_values("window_id")\
-        .to_csv(output_dir / "weighted_mean_primary.csv", index=False)
-        print("[done] weighted mean (primary) ->", output_dir / "weighted_mean_primary.csv")
+        .to_csv(output_dir / "weighted_mean_auxiliary.csv", index=False)
+        print("[done] auxiliary weighted summary ->", output_dir / "weighted_mean_auxiliary.csv")
 
     # 8. Lexical growth.
     growth_rows: List[dict] = []

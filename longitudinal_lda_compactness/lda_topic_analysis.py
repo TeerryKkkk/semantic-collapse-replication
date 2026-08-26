@@ -404,7 +404,7 @@ def refresh_bootstrap_outputs(output_dir: Path) -> None:
     else:
         LOGGER.info(
             "No k_seed_run.csv found; K-by-seed confidence intervals require one robustness rerun "
-            "to create run-level summaries under the cleaned pipeline"
+            "to create run-level summaries under the current analysis pipeline"
         )
 
 

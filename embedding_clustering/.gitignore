@@ -16,7 +16,6 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Local tool state
-.codex_tmp/
 .cupy_cache/
 .mplconfig/
 *.log
