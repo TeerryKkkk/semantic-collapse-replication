@@ -1,4 +1,4 @@
-"""Run only the final conversational HC-AD intervention.
+"""Run the conversational HC-AD intervention.
 
 The bundled, hash-verified baseline supplies prompts, memory/RAG, judge,
 routing, and round structure. This runner replaces only free-agent generation
@@ -66,7 +66,7 @@ def load_host_module(path: Path) -> ModuleType:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Run the final hc_ad_paper intervention only."
+        description="Run the HC-AD intervention."
     )
     parser.add_argument(
         "--host-simulation",

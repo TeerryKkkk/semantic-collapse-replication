@@ -1,4 +1,4 @@
-"""Deterministic spherical K-means used by the final analysis."""
+"""Deterministic spherical K-means for the embedding-clustering analysis."""
 
 from __future__ import annotations
 

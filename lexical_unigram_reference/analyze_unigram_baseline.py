@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Empirical-frequency IID unigram reference for lexical accumulation.
 
-The analysis reads the frozen cohort in ``cohort_manifest.csv``. For each run,
+The analysis reads the configured cohort in ``cohort_manifest.csv``. For each run,
 it applies the same lexical preprocessing to the observed trajectory and to the
 complete token stream used to estimate the empirical unigram probabilities.
 It then evaluates the analytical IID expectation at each 10-round interval.
@@ -562,7 +562,7 @@ def parse_args() -> argparse.Namespace:
         "--input-dir",
         type=pathlib.Path,
         required=True,
-        help="Directory containing the 15 transcript files in the frozen manifest.",
+        help="Directory containing the 15 transcript files in the configured manifest.",
     )
     parser.add_argument(
         "--output-dir",

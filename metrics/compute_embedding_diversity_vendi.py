@@ -9,7 +9,7 @@ utterances are sampled without replacement 200 times. For each draw, the
 cosine Gram matrix is converted to an eigenspectrum, Vendi effective support is
 computed, and the result is normalized by 30.
 
-The five-family, 15-run cohort is frozen below. The script writes tables only;
+The five-family, 15-run cohort is configured below. The script writes tables only;
 it contains no plotting, smoothing, regression, or figure-generation code.
 Existing compatible embedding caches are reused. New embeddings are generated
 only when ``--allow-api`` is supplied explicitly.
@@ -60,7 +60,7 @@ class RunSpec:
     filename: str
 
 
-# Frozen final public cohort: five model families x three independent runs.
+# Analysis cohort: five model families x three independent runs.
 COHORT: Tuple[RunSpec, ...] = (
     RunSpec("DeepSeek-V3", "3_deepseek_1000_v1", "3_deepseek_1000_v1.txt"),
     RunSpec("DeepSeek-V3", "3_deepseek_1000_v2", "3_deepseek_1000_v2.txt"),
@@ -632,8 +632,8 @@ def compute_all_intervals(
     rng = np.random.default_rng(RAREFACTION_RANDOM_SEED)
     output_rows: List[Dict[str, object]] = []
 
-    # The source implementation used one continuous RNG stream over run_id and
-    # window_id sorted order. The deterministic N == m branch consumes no draws.
+    # Use one continuous RNG stream over run_id and window_id sorted order.
+    # The deterministic N == m branch consumes no draws.
     for spec, metadata, embeddings in sorted(
         prepared_runs,
         key=lambda item: item[0].run_id,
@@ -679,7 +679,7 @@ def compute_all_intervals(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Compute m=30 rarefied normalized Vendi for the frozen 15-run cohort."
+        description="Compute m=30 rarefied normalized Vendi for the configured 15-run cohort."
     )
     parser.add_argument("--input-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)

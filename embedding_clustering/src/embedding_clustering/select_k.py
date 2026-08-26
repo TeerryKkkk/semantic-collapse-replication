@@ -48,7 +48,7 @@ def choose_k_from_summary(
 ) -> tuple[int, bool, pd.DataFrame]:
     """Apply the prespecified K rule to a per-K geometry summary.
 
-    Keeping this decision rule separate allows release QA to apply the same
+    Keeping this decision rule separate allows verification to apply the same
     implementation to saved summaries without repeating every fit.
     """
 
@@ -101,7 +101,7 @@ def select_k_for_family(
     *,
     progress: Callable[[str], None] | None = None,
 ) -> FamilySelection:
-    """Evaluate all prespecified K/seed combinations and select the final fit."""
+    """Evaluate all prespecified K/seed combinations and select the retained fit."""
 
     if matrix.shape[0] != 300:
         raise ValueError(f"{model_family}: expected 300 vectors, found {len(matrix)}")

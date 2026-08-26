@@ -40,7 +40,7 @@ def association_summary(assignments: pd.DataFrame) -> dict[str, float]:
 
 
 def assignment_label_hash(assignments: pd.DataFrame) -> str:
-    """Hash labels in family-row order for release verification."""
+    """Hash labels in family-row order for result verification."""
 
     import hashlib
 
