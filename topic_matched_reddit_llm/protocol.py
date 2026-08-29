@@ -17,6 +17,11 @@ CHUNKS_PER_WINDOW = 20
 WINDOW_TOKENS = CHUNK_TOKENS * CHUNKS_PER_WINDOW
 WINDOWS_PER_TRAJECTORY = CONTINUATION_TOKENS // WINDOW_TOKENS
 
+# Separate trajectory scale for lexical growth and first-window-anchored
+# within-run semantic diversity. The Vendi interval construction above is unchanged.
+TRAJECTORY_WINDOW_TOKENS = 200
+TRAJECTORY_WINDOWS_PER_TRAJECTORY = CONTINUATION_TOKENS // TRAJECTORY_WINDOW_TOKENS
+
 EARLY_WINDOWS = (1, 2, 3)
 LATE_WINDOWS = (8, 9, 10)
 
