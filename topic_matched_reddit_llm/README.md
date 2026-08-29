@@ -1,6 +1,6 @@
 # Topic- and Token-Matched Human–LLM Comparison
 
-This directory contains the topic- and token-matched Human–LLM comparison.
+This directory contains the reproducibility code for the topic- and token-matched Human–LLM comparison.
 
 The pipeline selects the human discussion threads used in the analysis, generates matched multi-agent continuations, converts both sources to the same fixed-token analysis representation, and computes the semantic-diversity comparison.
 
@@ -58,7 +58,7 @@ outputs/runs/
 python prepare_semantic_windows.py
 ```
 
-This produces the fixed-token chunks and matched analysis windows used for both human and model trajectories.
+This preserves the exact 20,000-token Human and model trajectories. The trajectory analysis uses 100 consecutive non-overlapping 200-token windows for cumulative lexical diversity and first-window-anchored within-run semantic diversity. The existing local semantic analysis separately uses 100-token chunks grouped into ten non-overlapping 2,000-token intervals for normalized Vendi and within-interval pairwise cosine similarity and distance.
 
 Outputs are written under:
 
@@ -78,7 +78,7 @@ Analysis outputs are written under:
 outputs/semantic_analysis/
 ```
 
-These include window-level semantic metrics, matched comparisons, early/late summaries, model-level summaries, thread-level summaries, and bootstrap results.
+These include 200-token cumulative lexical and anchored within-run trajectory metrics, local Vendi and within-interval pairwise cosine similarity/distance metrics, matched comparisons, model- and thread-level summaries, and question-level paired bootstrap results. In `early_late_vendi.csv`, Early uses intervals 1–3 and Late uses intervals 8–10.
 
 ## Tests
 
