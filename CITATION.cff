@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite this archived release."
+type: software
+title: "Code for Multi-LLM Systems Exhibit Robust Semantic Collapse"
+version: "1.0.0"
+date-released: 2026-10-14
+license: MIT
+repository-code: "https://github.com/TeerryKkkk/semantic-collapse-replication"
+abstract: >-
+  Simulation and analysis code accompanying the manuscript
+  Multi-LLM Systems Exhibit Robust Semantic Collapse.
+authors:
+  - family-names: Kong
+    given-names: Weiyi
+    affiliation: "Department of Electrical and Computer Engineering, University of Toronto, Canada"
+    orcid: "https://orcid.org/0009-0002-1948-1003"
+  - family-names: Lai
+    given-names: Shiyang
+    affiliation: "Department of Sociology and Knowledge Lab, University of Chicago, USA"
